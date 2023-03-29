@@ -1,0 +1,89 @@
+name: local-mongo-replicaset
+
+services:
+  # Define three mongo servers that will act as replicas
+  mongo1:
+    container_name: mongo1
+    hostname: mongo1
+    image: mongo
+    volumes:
+      - mongo1-data:/data/db
+      - mongo1-data:/data/configdb
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    restart: always
+    command: mongod --replSet mongo-replicaset
+  mongo2:
+    container_name: mongo2
+    hostname: mongo2
+    image: mongo
+    volumes:
+      - mongo2-data:/data/db
+      - mongo2-data:/data/configdb
+    expose:
+      - 27017
+    ports:
+      - 27018:27017
+    restart: always
+    command: mongod --replSet mongo-replicaset
+  mongo3:
+    container_name: mongo3
+    hostname: mongo3
+    image: mongo
+    volumes:
+      - mongo3-data:/data/db
+      - mongo3-data:/data/configdb
+    expose:
+      - 27017
+    ports:
+      - 27019:27017
+    restart: always
+    command: mongod --replSet mongo-replicaset
+
+  # Define the initialization server
+  # Runs the `rs.initiate` command to initialize the replica set and connect the three servers to each other
+  mongoinit:
+    image: mongo
+    volumes:
+      - mongoinit-data:/data/db
+      - mongoinit-data:/data/configdb
+    # Exit after executing the command
+    restart: "no"
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    command: >
+      mongosh --host mongo1:27017 --eval
+      '
+      db = (new Mongo("mongo1:27017")).getDB("test");
+      config = {
+      "_id" : "mongo-replicaset",
+      "members" : [
+        {
+          "_id" : 0,
+          "host" : "mongo1:27017",
+          "priority" : 3,
+        },
+        {
+          "_id" : 1,
+          "host" : "mongo2:27017",
+          "priority" : 2,
+        },
+        {
+          "_id" : 2,
+          "host" : "mongo3:27017",
+          "priority" : 1,
+        }
+      ]
+      };
+      rs.initiate(config);
+      '
+
+volumes:
+  mongo1-data:
+  mongo2-data:
+  mongo3-data:
+  mongoinit-data:
