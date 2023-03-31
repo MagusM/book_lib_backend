@@ -4,9 +4,10 @@ import { Book } from '../models/Book';
 
 export const getBooks = async (req: Request, res: Response) => {
     const { q, startIndex, maxResults } = req.query;
+    const booksApi = process.env.GOOGLE_BOOKS_API;
 
     try {
-        const response = await axios.get('https://www.googleapis.com/books/v1/volumes', {
+        const response = await axios.get(booksApi, {
             params: {
                 q,
                 startIndex,

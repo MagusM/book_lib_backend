@@ -1,6 +1,7 @@
 import express, { Request as ExpressRequest, Response } from 'express';
 import { IUser } from '../models/User';
 import UserModel from '../models/User';
+import requireSession from '../middlewares/authMiddleware';
 
 interface RequestWithSession extends ExpressRequest {
     session: any;
@@ -48,8 +49,12 @@ router.get('/:id', async (req: RequestWithSession, res: Response) => {
     }
 });
 
-// Update user lastLoggedIn date
-router.put('/:id', async (req: RequestWithSession, res: Response) => {
+/**
+ * Update user lastLoggedIn date
+ * 
+ * todo: consider move this logic to be part of logininstead of seperate route
+ */
+router.put('/:id', requireSession, async (req: RequestWithSession, res: Response) => {
     try {
         const user: IUser | null = await UserModel.findOneAndUpdate(
             { id: req.params.id },

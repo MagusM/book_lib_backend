@@ -21,3 +21,5 @@ const requireSession = (req: RequestWithSession, res: Response, next: NextFuncti
 //     // Only accessible if session is valid
 //     res.send('This is a protected route.');
 // });
+
+export default requireSession;
