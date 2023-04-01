@@ -11,8 +11,7 @@ const login = async (req, res) => {
         const { doc: user, created } = await UserModel.findOrCreate({ name });
 
         if (!user) {
-            res.status(404).send('User not found');
-            return;
+            return res.status(404).send('User not found');
         }
 
         // Update lastLoggedIn date for existing users
@@ -25,10 +24,10 @@ const login = async (req, res) => {
         req.session.userId = user.id;
 
         // Send response
-        res.cookie('sessionId', req.session.id).status(200).send('Logged in successfully');
+        return res.cookie('sessionId', req.session.id).status(200).send('Logged in successfully');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error logging in');
+        return res.status(500).send('Error logging in');
     }
 }
 
@@ -40,14 +39,29 @@ const getUserById = async (req, res) => {
         const user: IUser | null = await UserModel.findOne({ id });
 
         if (!user) {
-            res.status(404).send('User not found');
-            return;
+            return res.status(404).send('User not found');
         }
 
-        res.status(200).send(user);
+        return res.status(200).send(user);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error fetching user');
+        return res.status(500).send('Error fetching user by id');
+    }
+}
+
+const getUserByName = async (req, res) => {
+    const { name } = req.params;
+    try {
+        const user: IUser | null = await UserModel.findOne({ name: new RegExp(name, 'i') });
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        return res.status(200).send(user);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error fetching user by name');
     }
 }
 
@@ -63,14 +77,13 @@ const updateUser = async (req, res) => {
         );
 
         if (!user) {
-            res.status(404).send('User not found');
-            return;
+            return res.status(404).send('User not found');
         }
 
-        res.status(200).send(user);
+        return res.status(200).send(user);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error updating user');
+        return res.status(500).send('Error updating user');
     }
 }
 
@@ -78,5 +91,6 @@ const updateUser = async (req, res) => {
 export {
     login,
     getUserById,
+    getUserByName,
     updateUser
 }

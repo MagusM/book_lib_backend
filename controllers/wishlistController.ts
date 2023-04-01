@@ -7,10 +7,10 @@ export const getWishlist = async (req: Request, res: Response) => {
 
     try {
         const wishlist = await WishlistModel.findOne({ userId });
-        res.status(200).send(wishlist);
+        return res.status(200).send(wishlist);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error fetching wishlist');
+        return res.status(500).send('Error fetching wishlist');
     }
 };
 
@@ -28,7 +28,7 @@ export const addBookToWishlist = async (req: Request, res: Response) => {
                 books
             });
             await newWishlist.save();
-            res.status(200).send(newWishlist);
+            return res.status(200).send(newWishlist);
         } else {
             // Wishlist exists, get the current books array
             const currentBooks = wishlist.books;
@@ -42,11 +42,11 @@ export const addBookToWishlist = async (req: Request, res: Response) => {
             // Update the wishlist with the new books array
             wishlist.books = newBooks;
             const updatedWishlist = await wishlist.save();
-            res.status(200).send(updatedWishlist);
+            return res.status(200).send(updatedWishlist);
         }
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error adding book(s) to wishlist');
+        return res.status(500).send('Error adding book(s) to wishlist');
     }
 };
 
@@ -60,9 +60,9 @@ export const deleteBookFromWishlist = async (req: Request, res: Response) => {
             { new: true }
         );
 
-        res.status(200).send(wishlist);
+        return res.status(200).send(wishlist);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error deleting book from wishlist');
+        return res.status(500).send('Error deleting book from wishlist');
     }
 };

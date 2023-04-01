@@ -28,7 +28,7 @@ const getBooks: RequestHandler = async (req, res) => {
             .sort('title')
             .exec();
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: books,
             page,
@@ -37,7 +37,7 @@ const getBooks: RequestHandler = async (req, res) => {
         });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        return res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 
