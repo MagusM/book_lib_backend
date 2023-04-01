@@ -16,37 +16,39 @@ export const getWishlist = async (req: Request, res: Response) => {
 
 export const addBookToWishlist = async (req: Request, res: Response) => {
     const { userId } = req.params;
-    const { book } = req.body;
+    const { books } = req.body;
 
     try {
         const wishlist = await WishlistModel.findOne({ userId });
 
         if (!wishlist) {
-            // Wishlist doesn't exist, create a new one and add the book
+            // Wishlist doesn't exist, create a new one and add the books
             const newWishlist = new WishlistModel({
                 userId,
-                books: [book]
+                books
             });
             await newWishlist.save();
             res.status(200).send(newWishlist);
         } else {
-            // Wishlist exists, check if the book is already in the list
-            const bookExists = wishlist.books.some(b => b._id === book._id);
+            // Wishlist exists, get the current books array
+            const currentBooks = wishlist.books;
 
-            if (bookExists) {
-                res.status(409).send('Book already exists in wishlist');
-            } else {
-                wishlist.books.push(book);
-                const updatedWishlist = await wishlist.save();
-                res.status(200).send(updatedWishlist);
-            }
+            // Build a new books array from the input and from mongo, making sure there are no duplicates
+            const newBooks = [
+                ...currentBooks,
+                ...books.filter((book) => !currentBooks.some((b) => b._id === book._id)),
+            ];
+
+            // Update the wishlist with the new books array
+            wishlist.books = newBooks;
+            const updatedWishlist = await wishlist.save();
+            res.status(200).send(updatedWishlist);
         }
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error adding book to wishlist');
+        res.status(500).send('Error adding book(s) to wishlist');
     }
 };
-
 
 export const deleteBookFromWishlist = async (req: Request, res: Response) => {
     const { userId, bookId } = req.params;
