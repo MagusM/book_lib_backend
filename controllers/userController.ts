@@ -7,24 +7,31 @@ const login = async (req, res) => {
     try {
         const { name } = req.body;
 
-        // Check if user exists
-        const user = await UserModel.findOne({ name });
+        // Find or create user
+        const { doc: user, created } = await UserModel.findOrCreate({ name });
 
         if (!user) {
             res.status(404).send('User not found');
             return;
         }
 
+        // Update lastLoggedIn date for existing users
+        if (!created) {
+            user.lastLoggedIn = new Date();
+            await user.save();
+        }
+
         // Store user ID in session
         req.session.userId = user.id;
 
         // Send response
-        res.status(200).send('Logged in successfully');
+        res.cookie('sessionId', req.session.id).status(200).send('Logged in successfully');
     } catch (error) {
         console.error(error);
         res.status(500).send('Error logging in');
     }
 }
+
 
 const getUserById = async (req, res) => {
     const { id } = req.params;

@@ -12,14 +12,8 @@ const requireSession = (req: RequestWithSession, res: Response, next: NextFuncti
     } else {
         // Session is invalid, redirect to login page
         // todo: res.redirect('/login') ? instead of 401 ... ?
-        return res.status(401).send('Unauthorized');
+        return res.status(401).send('Session expired or invalid');
     }
 };
-
-// Route that requires a valid session
-// app.get('/protected', requireSession, (req: Request, res: Response) => {
-//     // Only accessible if session is valid
-//     res.send('This is a protected route.');
-// });
 
 export default requireSession;
