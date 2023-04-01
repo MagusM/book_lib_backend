@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import * as mongoose from "mongoose";
+import mongoose from "mongoose";
 
 import booksRoutes from './routes/booksRoutes';
 import wishlistRoutes from './routes/wishlistRoutes';
@@ -43,6 +43,7 @@ const mOptions = {
     useCreateIndex: true,
     useFindAndModify: false
 };
+mongoose.set('debug', true);
 mongoose.connect(dbURI).then(() => {
     console.log('MongoDB connected.');
     app.listen(port, () => {

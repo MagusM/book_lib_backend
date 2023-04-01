@@ -3,11 +3,30 @@ import express, { Request, Response } from 'express';
 import { IUser } from '../models/User';
 import UserModel from '../models/User';
 
-// Create a new router for the user routes
-const router = express.Router();
+const login = async (req, res) => {
+    try {
+        const { name } = req.body;
 
-// Define the GET route for retrieving a user by ID
-router.get('/:id', async (req: Request, res: Response) => {
+        // Check if user exists
+        const user = await UserModel.findOne({ name });
+
+        if (!user) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        // Store user ID in session
+        req.session.userId = user.id;
+
+        // Send response
+        res.status(200).send('Logged in successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error logging in');
+    }
+}
+
+const getUserById = async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -23,10 +42,9 @@ router.get('/:id', async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).send('Error fetching user');
     }
-});
+}
 
-// Define the PUT route for updating a user's lastLoggedIn property
-router.put('/:id', async (req: Request, res: Response) => {
+const updateUser = async (req, res) => {
     const { id } = req.params;
     const { lastLoggedIn } = req.body;
 
@@ -47,7 +65,11 @@ router.put('/:id', async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).send('Error updating user');
     }
-});
+}
 
 // Export the user router
-export default router;
+export {
+    login,
+    getUserById,
+    updateUser
+}

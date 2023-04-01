@@ -1,4 +1,4 @@
-name: local-mongo-replicaset
+version: '3.9'
 
 services:
   # Define three mongo servers that will act as replicas
