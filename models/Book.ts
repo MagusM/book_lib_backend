@@ -7,10 +7,10 @@ export interface Book extends Document {
     imageUrl?: string;
     description?: string;
     publishedDate?: Date;
-    wishlisted?: boolean;
 }
 
 const BookSchema: Schema = new Schema({
+    id: { type: String, require: true},
     title: { type: String, required: true },
     author: { type: String, required: true },
     imageUrl: { type: String },

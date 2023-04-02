@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import WishlistModel from '../models/Wishlist';
-import { Book } from '../models/Book';
+import BookModel, { Book as BookI } from '../models/Book';
 
 export const getWishlist = async (req: Request, res: Response) => {
     const { userId } = req.params;
@@ -23,24 +23,38 @@ export const addBookToWishlist = async (req: Request, res: Response) => {
 
         if (!wishlist) {
             // Wishlist doesn't exist, create a new one and add the books
+            const bookIds = await Promise.all(
+                books.map(async (book) => {
+                    const newBook = new BookModel(book);
+                    await newBook.save();
+                    return newBook._id;
+                })
+            );
+
             const newWishlist = new WishlistModel({
-        userId,
-                books
-    });
+                userId,
+                books: bookIds,
+            });
             await newWishlist.save();
             return res.status(200).send(newWishlist);
         } else {
             // Wishlist exists, get the current books array
-            const currentBooks = wishlist.books;
+            const currentBookIds = wishlist.books;
 
             // Build a new books array from the input and from mongo, making sure there are no duplicates
-            const newBooks = [
-                ...currentBooks,
-                ...books.filter((book) => !currentBooks.some((b) => b._id === book._id)),
+            const newBookIds = [
+                ...currentBookIds,
+                ...books
+                    .filter((book) => !currentBookIds.includes(book._id))
+                    .map((book) => new BookModel(book))
+                    .map(async (newBook) => {
+                        await newBook.save();
+                        return newBook._id;
+                    }),
             ];
 
             // Update the wishlist with the new books array
-            wishlist.books = newBooks;
+            wishlist.books = newBookIds;
             const updatedWishlist = await wishlist.save();
             return res.status(200).send(updatedWishlist);
         }
@@ -49,6 +63,7 @@ export const addBookToWishlist = async (req: Request, res: Response) => {
         return res.status(500).send('Error adding book(s) to wishlist');
     }
 };
+
 
 export const deleteBookFromWishlist = async (req: Request, res: Response) => {
     const { userId, bookId } = req.params;
