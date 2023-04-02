@@ -1,8 +1,6 @@
 import express, { Request as ExpressRequest, Response } from 'express';
-import { IUser } from '../models/User';
-import UserModel from '../models/User';
-import requireSession from '../middlewares/authMiddleware';
 import { getUserById, getUserByName, login, updateUser } from '../controllers/userController';
+import jwtAuthenticate from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
@@ -15,6 +13,6 @@ router.get('/name/:name', getUserByName);
  * 
  * todo: consider move this logic to be part of login logic instead
  */
-router.put('/:id', requireSession, updateUser);
+router.put('/:id', jwtAuthenticate, updateUser);
 
 export default router;

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { getWishlist, addBookToWishlist, deleteBookFromWishlist } from '../controllers/wishlistController';
-import requireSession from '../middlewares/authMiddleware';
+import jwtAuthenticate from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.get('/:userId', requireSession, getWishlist);
-router.post('/:userId', requireSession, addBookToWishlist);
-router.delete('/:userId/:bookId', requireSession, deleteBookFromWishlist);
+router.get('/:userId', jwtAuthenticate, getWishlist);
+router.post('/:userId', jwtAuthenticate, addBookToWishlist);
+router.delete('/:userId/:bookId', jwtAuthenticate, deleteBookFromWishlist);
 
 export default router;

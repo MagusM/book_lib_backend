@@ -24,9 +24,9 @@ export const addBookToWishlist = async (req: Request, res: Response) => {
         if (!wishlist) {
             // Wishlist doesn't exist, create a new one and add the books
             const newWishlist = new WishlistModel({
-                userId,
+        userId,
                 books
-            });
+    });
             await newWishlist.save();
             return res.status(200).send(newWishlist);
         } else {

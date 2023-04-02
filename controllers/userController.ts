@@ -1,5 +1,5 @@
 // Import the necessary modules and models
-import express, { Request, Response } from 'express';
+const jwt = require('jsonwebtoken');
 import { IUser } from '../models/User';
 import UserModel from '../models/User';
 
@@ -20,11 +20,18 @@ const login = async (req, res) => {
             await user.save();
         }
 
-        // Store user ID in session
-        req.session.userId = user.id;
+        // Generate JWT token
+        const secret = process.env.JWT_SECRET
+        const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '4h' });
+        // Send token as a cookie and in the response body
+        res.cookie('jwt', token, { httpOnly: true });
 
-        // Send response
-        return res.cookie('sessionId', req.session.id).status(200).send('Logged in successfully');
+        return res.status(200).json({
+            data: {
+                user: user,
+                token: token
+            }
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error logging in');

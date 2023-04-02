@@ -8,7 +8,6 @@ import wishlistRoutes from './routes/wishlistRoutes';
 import userRoutes from './routes/userRoutes';
 import BookModel from './models/Book';
 import WishlistModel from './models/Wishlist';
-import session from 'express-session';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,16 +15,6 @@ dotenv.config();
 const app: Application = express();
 const port = 3001 || process.env.PORT;
 const dbURI = process.env.DB_URI;
-
-app.use(
-    session({
-        secret: 'bookloop',
-        resave: false,
-        saveUninitialized: false,
-        cookie: { maxAge: 60000 },
-    })
-);
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

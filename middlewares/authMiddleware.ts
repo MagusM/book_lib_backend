@@ -1,19 +1,34 @@
-import express, { NextFunction, Request as ExpressRequest, Response } from 'express';
-interface RequestWithSession extends ExpressRequest {
-    session: any;
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+
+interface AuthenticatedRequest extends Request {
+    userId: string;
 }
 
-// Middleware function that checks for a valid session
-const requireSession = (req: RequestWithSession, res: Response, next: NextFunction) => {
-    // Check if session exists and is not expired
-    if (req.session && req.session.userId && req.session.cookie.expires > Date.now()) {
-        // Session is valid, continue with request
+// Middleware function that checks for a valid JWT
+const jwtAuthenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    // Get the JWT token from the authorization header
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    // If no token is provided, return an error response
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        // Verify the JWT token using the secret key
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Attach the user ID to the request object for later use
+        req.userId = decoded.userId;
+
+        // Call the next middleware function in the chain
         next();
-    } else {
-        // Session is invalid, redirect to login page
-        // todo: res.redirect('/login') ? instead of 401 ... ?
-        return res.status(401).send('Session expired or invalid');
+    } catch (error) {
+        console.error(error);
+        return res.status(403).json({ error: 'Forbidden' });
     }
 };
 
-export default requireSession;
+export default jwtAuthenticate;

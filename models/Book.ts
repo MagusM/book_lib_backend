@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface Book extends Document {
+    id?: string;
     title: string;
     author: string;
     imageUrl?: string;
     description?: string;
     publishedDate?: Date;
+    wishlisted?: boolean;
 }
 
 const BookSchema: Schema = new Schema({

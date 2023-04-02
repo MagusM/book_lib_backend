@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getBooks } from '../controllers/booksController';
-import requireSession from '../middlewares/authMiddleware';
+import jwtAuthenticate from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.get('/', requireSession, getBooks);
+router.get('/', jwtAuthenticate, getBooks);
 
 export default router;
