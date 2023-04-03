@@ -1,6 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "author": {
+    "name": "Simon Mor",
+    "email": "simomor@gmail.com",
+    "url": "https://simonmor.com"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,7 +13,6 @@
     "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' server.ts"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/body-parser": "^1.19.2",
