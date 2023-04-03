@@ -9,13 +9,13 @@ export interface Book extends Document {
     publishedDate?: Date;
 }
 
-const BookSchema: Schema = new Schema({
+export const BookSchema: Schema = new Schema({
     id: { type: String, require: true},
     title: { type: String, required: true },
     author: { type: String, required: true },
     imageUrl: { type: String },
     description: { type: String },
     publishedDate: { type: Date }
-});
+}, {_id: false});
 
 export default mongoose.model<Book>('Book', BookSchema);
