@@ -10,7 +10,7 @@ const getBooks: RequestHandler = async (req, res) => {
         }
         const search = req.query.q || 'all';
         const page = Number(req.query.page) || 1;
-        const pageSize = Number(req.query.pageSize) || 10;
+        const pageSize = Number(req.query.pageSize) || 20;
 
         const API_KEY = process.env.GOOGLE_BOOKS_KEY;
         const response = await axios.get(process.env.GOOGLE_BOOKS_API, {
@@ -23,10 +23,6 @@ const getBooks: RequestHandler = async (req, res) => {
         });
 
         const totalBooks = response.data.totalItems;
-        const totalPages = Math.ceil(totalBooks / pageSize);
-
-        // Fetch user's wishlist
-        const wishlist = await Wishlist.findOne({ userId: req.query.userId }).populate('books');
 
         const books = response.data.items.map((item: any) => {
             const id = item.id;
@@ -34,18 +30,14 @@ const getBooks: RequestHandler = async (req, res) => {
             const author = item.volumeInfo.authors?.[0] || 'John Doe';
             const imageUrl = item.volumeInfo.imageLinks?.thumbnail || '';
             const description = item.volumeInfo.description;
-            const publishDateStr = item.volumeInfo.publishedDate;
-            const publishDate = publishDateStr ? new Date(publishDateStr) : undefined;
-            // Check if book is wishlisted
-            const wishlisted = wishlist?.books.some((book) => book.id === id) || false;
-            return { id, title, author, imageUrl, description, publishDate, wishlisted };
+            
+            return { id, title, author, imageUrl, description };
         });
 
         return res.status(200).json({
             success: true,
             data: books,
             page,
-            totalPages,
             totalBooks,
         });
     } catch (err) {
