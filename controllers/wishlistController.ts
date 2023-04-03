@@ -11,9 +11,8 @@ export const getWishlist = async (req: Request, res: Response) => {
     }
 
     res.json({
-        id: wishlist._id.toString(),
-        userId: userId,
-        books: wishlist.books,
+        wishlist: wishlist,
+        length: wishlist.books.length
     });
 };
 
@@ -35,7 +34,11 @@ export const addBookToWishlist = async(req: Request, res: Response) => {
         });
         // return res.json(newWishlist);
         await newWishlist.save();
-        return res.status(201).json(newWishlist);
+        
+        return res.status(201).json({
+            wishlist: newWishlist,
+            length: newWishlist.books.length
+        });
     } else {
         // Otherwise, add the new books to the existing wishlist
         const currArrayBooksIds = wishlist.books.map((book: BookI) => book.id);
@@ -45,7 +48,11 @@ export const addBookToWishlist = async(req: Request, res: Response) => {
             }
         }
         await wishlist.save();
-        return res.status(200).json(wishlist);
+        
+        return res.status(201).json({
+            wishlist: wishlist,
+            length: wishlist.books.length
+        });
     }
 }
 
@@ -61,7 +68,11 @@ export const deleteBookFromWishlist = async (req: Request, res: Response) => {
         const newBooks = wishlist.books.filter((book: BookI) => book.id.toString() !== bookId);
         wishlist.books = newBooks;
         await wishlist.save();
-        return res.status(200).json(wishlist);
+        
+        return res.status(200).json({
+            wishlist: wishlist,
+            length: wishlist.books.length
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error deleting book from wishlist');
