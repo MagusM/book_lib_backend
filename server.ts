@@ -1,14 +1,14 @@
-import express, { Application } from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
+import express, { Application } from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
 import mongoose from "mongoose";
 
-import booksRoutes from './routes/booksRoutes';
-import wishlistRoutes from './routes/wishlistRoutes';
-import userRoutes from './routes/userRoutes';
-import BookModel from './models/Book';
-import WishlistModel from './models/Wishlist';
-import dotenv from 'dotenv';
+import booksRoutes from "./routes/booksRoutes";
+import wishlistRoutes from "./routes/wishlistRoutes";
+import userRoutes from "./routes/userRoutes";
+import BookModel from "./models/Book";
+import WishlistModel from "./models/Wishlist";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -20,40 +20,43 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use('/api/books', booksRoutes);
-app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/users', userRoutes);
+app.use("/api/books", booksRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/users", userRoutes);
 
 console.log(`Starting server.`);
 
 const mOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
 };
-mongoose.set('debug', true);
-mongoose.connect(dbURI).then(() => {
-    console.log('MongoDB connected.');
+mongoose.set("debug", true);
+mongoose
+  .connect(dbURI)
+  .then(() => {
+    console.log("MongoDB connected.");
     app.listen(port, () => {
-        console.log(`Server up and running.`);
+      console.log(`Server up and running.`);
     });
 
     // Ensure indexes and create collections
     BookModel.ensureIndexes();
     WishlistModel.ensureIndexes();
 
-    mongoose.connection.on('open', () => {
-        console.log('MongoDB connection opened.');
+    mongoose.connection.on("open", () => {
+      console.log("MongoDB connection opened.");
 
-        // Create collections
-        mongoose.connection.db.createCollection('users');
-        mongoose.connection.db.createCollection('books');
-        mongoose.connection.db.createCollection('wishlists');
+      // Create collections
+      mongoose.connection.db.createCollection("users");
+      mongoose.connection.db.createCollection("books");
+      mongoose.connection.db.createCollection("wishlists");
     });
-}).catch(err => {
+  })
+  .catch((err) => {
     console.log("db failed to connect: ", err);
     process.exit(-1);
-});
+  });
 
 export default app;
